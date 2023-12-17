@@ -7,10 +7,12 @@ let tweets = [
    {
       id: "1",
       text: "first",
+      userId: "2"
    },
    {
       id: "2",
       text: "second",
+      userId: "1"
    }
 ];
 
@@ -73,7 +75,8 @@ const resolvers = {
       postTweet(_, {text, userId}) {
          const newTweet = {
             id: tweets.length + 1,
-            text
+            text,
+            userId
          };
          tweets.push(newTweet);
          return newTweet;
@@ -89,16 +92,21 @@ const resolvers = {
     type resolvers 정의
     작동 순서
     1. allUsers 쿼리 실행
-    2. allUsers resolvers 실행
-    3. graphql 에서 allUsers가 return 하는 data 에 fullName field 가 없다는 걸 확인
-    4. graphql 은 resolvers 에서 type User 의 field 이름이 fullName 인 것을 찾으려고 함
-    5. 있다면 fullName 함수 실행
-    6. 리턴 값이 기존 타입에 해당하는 필드 값을 추가 해줌
+    2. 해당 쿼리에 대한 Resolvers 함수인 allUsers Resolvers가 실행
+    3. GraphQL은 allUsers 쿼리의 결과로 나온 데이터에서 fullName 필드가 없다는 것을 확인
+    4. GraphQL은 Resolvers에서 정의한 타입 중에서 fullName 필드를 찾으려고 함
+    5. fullName 필드가 해당 타입(User)에서 정의되어 있다면 fullName 함수를 실행
+    6. 함수의 반환 값은 기존 타입(User)의 필드 값에 fullName을 추가하여 최종적인 응답 데이터가 됨
     */
    User: {
        fullName({firstName, lastName}) {
           return `${firstName} ${lastName}`;
        }
+   },
+   Tweet: {
+      author({userId}) {
+         return users.find(user => user.id === userId);
+      }
    }
 }
 
