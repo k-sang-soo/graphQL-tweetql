@@ -3,7 +3,7 @@ import { gql } from 'graphql-tag';
 import {startStandaloneServer} from "@apollo/server/standalone";
 
 // 더미 데이터
-const tweets = [
+let tweets = [
    {
       id: "1",
       text: "first",
@@ -54,6 +54,22 @@ const resolvers = {
       // query 요청할 떄 보낸 args는 resolvers의 두번째 args에 들어감
       tweet(root, {id}) {
          return tweets.find(tweet => tweet.id === id);
+      }
+   },
+   Mutation: {
+      postTweet(_, {text, userId}) {
+         const newTweet = {
+            id: tweets.length + 1,
+            text
+         };
+         tweets.push(newTweet);
+         return newTweet;
+      },
+      deleteTweet(_, {id}) {
+         const tweet = tweets.find(tweet => tweet.id === id);
+         if(!tweet) return false;
+         tweets = tweets.filter(tweet => tweet.id !== id);
+         return true;
       }
    }
 }
